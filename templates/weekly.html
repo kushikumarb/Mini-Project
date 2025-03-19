@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weekly Expense</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+        color: #333;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 20px 0;
+        padding-top: 20px;
+        color: #495057;
+      }
+
+      .chart-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 40px auto;
+        width: 90%;
+        max-width: 1200px;
+      }
+
+      canvas {
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+      }
+
+      .navigation-btn {
+        position: absolute;
+        font-size: 24px;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        color: black;
+        z-index: 10;
+      }
+
+      .left-arrow {
+        left: 20px;
+      }
+
+      .right-arrow {
+        right: 20px;
+      }
+
+      .navigation-btn:hover {
+        color: #0056b3;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 70px;
+        left: 20px;
+        border: none;
+        color: #007bff;
+        font-size: 40px;
+        height: 70px;
+        width: 70px;
+        border-radius: 90px;
+        cursor: pointer;
+      }
+
+      .back-button:hover {
+        color: white;
+        background-color: #007bff;
+      }
+
+      .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .fixed-header .site-name {
+        font-weight: bold;
+        font-size: 20px;
+        margin-left: 10px;
+      }
+
+      .fixed-header .contact-us {
+        text-decoration: none;
+        color: white;
+        font-size: 16px;
+        padding: 5px 10px;
+        border: 2px solid white;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        margin-right: 50px;
+      }
+
+      .fixed-header .contact-us:hover {
+        background-color: white;
+        color: #007bff;
+      }
+
+      body {
+        margin-top: 60px;
+      }
+
+      .week-range {
+        margin-top: 10px;
+        font-size: 18px;
+        color: #333;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fixed-header">
+      <div class="site-name">SpendSync</div>
+      <a href="/contact-us" class="contact-us">Contact Us</a>
+    </div>
+    <button class="back-button" onclick="goBack()">&#8592;</button>
+    <h1>Weekly Expense Analysis</h1>
+    <div class="chart-container">
+      <button class="navigation-btn left-arrow" onclick="navigateWeek(-1)">
+        &#8592;
+      </button>
+      <canvas id="weekly-expense-chart"></canvas>
+      <button class="navigation-btn right-arrow" onclick="navigateWeek(1)">
+        &#8594;
+      </button>
+      <div id="week-range" class="week-range"></div>
+    </div>
+
+    <script>
+      let currentWeekOffset = 0;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const chartCanvas = document.getElementById("weekly-expense-chart");
+        const weekRangeElement = document.getElementById("week-range");
+
+        function fetchWeeklyData(offset = 0) {
+          const today = new Date();
+          const currentDay = today.getDay();
+
+          const sunday = new Date(today);
+          sunday.setDate(today.getDate() - currentDay + offset * 7);
+
+          const saturday = new Date(sunday);
+          saturday.setDate(sunday.getDate() + 6);
+
+          const options = { year: "numeric", month: "short", day: "numeric" };
+          const weekRange = `${sunday.toLocaleDateString(
+            undefined,
+            options
+          )} - ${saturday.toLocaleDateString(undefined, options)}`;
+          weekRangeElement.textContent = `Showing data for: ${weekRange}`;
+
+          fetch(`/weekly_expenses/${offset}`)
+            .then((response) => response.json())
+            .then((weeklyData) => {
+              renderChart(weeklyData);
+            })
+            .catch((error) => {
+              console.error("Error fetching weekly expenses:", error);
+            });
+        }
+
+        function renderChart(weeklyData) {
+          const labels = weeklyData.map((entry) => entry.day);
+          const data = weeklyData.map((entry) => entry.expense);
+
+          if (chartCanvas.chart) {
+            chartCanvas.chart.destroy();
+          }
+
+          chartCanvas.chart = new Chart(chartCanvas, {
+            type: "bar",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Weekly Expenses",
+                  data,
+                  backgroundColor: "#FFCE56",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+              scales: {
+                x: {
+                  beginAtZero: true,
+                },
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
+        }
+
+        window.navigateWeek = (direction) => {
+          currentWeekOffset += direction;
+          fetchWeeklyData(currentWeekOffset);
+        };
+
+        fetchWeeklyData(currentWeekOffset);
+      });
+
+      function goBack() {
+        window.location.href = "/";
+      }
+    </script>
+  </body>
+</html>

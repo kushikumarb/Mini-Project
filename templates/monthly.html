@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Expense</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+        color: #333;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 20px 0;
+        font-size: 2rem;
+        color: #444;
+        padding-top: 20px;
+      }
+
+      .year-display {
+        font-size: 1.5rem;
+        margin: 10px 0;
+        color: #555;
+      }
+
+      .chart-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 40px 0;
+        padding: 20px;
+      }
+
+      .chart-wrapper {
+        max-width: 1000px;
+        width: 90%;
+      }
+
+      .arrow-button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2rem;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        color: black;
+      }
+
+      .arrow-button:hover {
+        color: #0056b3;
+      }
+
+      .left-arrow {
+        left: 10px;
+      }
+
+      .right-arrow {
+        right: 10px;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 70px;
+        left: 20px;
+        border: none;
+        color: #007bff;
+        font-size: 40px;
+        height: 70px;
+        width: 70px;
+        border-radius: 90px;
+        cursor: pointer;
+      }
+
+      .back-button:hover {
+        color: white;
+        background-color: #007bff;
+      }
+      .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .fixed-header .site-name {
+        font-weight: bold;
+        font-size: 20px;
+        margin-left: 10px;
+      }
+
+      .fixed-header .contact-us {
+        text-decoration: none;
+        color: white;
+        font-size: 16px;
+        padding: 5px 10px;
+        border: 2px solid white;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        margin-right: 50px;
+      }
+
+      .fixed-header .contact-us:hover {
+        background-color: white;
+        color: #007bff;
+      }
+
+      body {
+        margin-top: 60px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fixed-header">
+      <div class="site-name">SpendSync</div>
+      <a href="/contact-us" class="contact-us">Contact Us</a>
+    </div>
+    <button class="back-button" onclick="goBack()">&#8592;</button>
+    <h1>Monthly Expense Analysis</h1>
+    <p class="year-display" id="current-year"></p>
+    <div class="chart-container">
+      <button class="arrow-button left-arrow" onclick="navigateYear(-1)">
+        &#8592;
+      </button>
+      <div class="chart-wrapper">
+        <canvas id="expense-chart"></canvas>
+      </div>
+      <button class="arrow-button right-arrow" onclick="navigateYear(1)">
+        &#8594;
+      </button>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const chartCanvas = document.getElementById("expense-chart");
+        const currentYearElement = document.getElementById("current-year");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const year = urlParams.get("year") || new Date().getFullYear();
+
+        currentYearElement.textContent = year;
+
+        const expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+        const monthlyExpenses = {};
+
+        const allMonths = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+
+        allMonths.forEach((month) => {
+          monthlyExpenses[month] = 0;
+        });
+
+        expenses.forEach((expense) => {
+          const date = new Date(expense.date);
+          if (date.getFullYear() === parseInt(year, 10)) {
+            const month = date.toLocaleString("default", { month: "long" });
+            if (monthlyExpenses.hasOwnProperty(month)) {
+              monthlyExpenses[month] += expense.amount;
+            }
+          }
+        });
+
+        const labels = allMonths;
+        const data = allMonths.map((month) => monthlyExpenses[month]);
+
+        new Chart(chartCanvas, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Monthly Expenses",
+                data,
+                backgroundColor: "#36A2EB",
+                borderColor: "#4CAF50",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      });
+
+      function navigateYear(offset) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentYear = parseInt(
+          urlParams.get("year") || new Date().getFullYear(),
+          10
+        );
+        const newYear = currentYear + offset;
+        window.location.href = `/monthly_expenses?year=${newYear}`;
+      }
+      function goBack() {
+        window.location.href = "/";
+      }
+    </script>
+  </body>
+</html>

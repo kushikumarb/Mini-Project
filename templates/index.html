@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      .hamburger-menu {
+        position: fixed;
+        top: 15px;
+        left: 10px;
+        cursor: pointer;
+        z-index: 1000;
+      }
+
+      .hamburger-menu .line {
+        width: 25px;
+        height: 3px;
+        background-color: black;
+        margin: 5px 0;
+      }
+
+      .dashboard {
+        position: fixed;
+        top: 0;
+        left: -250px;
+        width: 230px;
+        height: 100%;
+        background-color: #007bff;
+        color: white;
+        transition: all 0.3s ease;
+        z-index: 999;
+      }
+
+      .dashboard.active {
+        left: 0;
+      }
+
+      .dashboard-content {
+        margin-top: 50px;
+      }
+
+      .main-content {
+        transition: all 0.3s ease;
+      }
+
+      .main-content.shrink {
+        margin-left: 250px;
+        transition: all 0.3s ease;
+      }
+
+      .main-content h1 {
+        text-align: center;
+        margin-top: 70px;
+        color: #007bff;
+      }
+
+      .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        margin-top: 50px;
+        padding-top: 0.5px;
+      }
+
+      .form-container input,
+      .form-container select,
+      .form-container button {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+      }
+
+      .btns {
+        margin-top: 20px;
+      }
+
+      .nav-btn {
+        display: inline-block;
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .nav-btn:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fixed-header">
+      <div class="site-name">SpendSync</div>
+      <a href="/contact-us" class="contact-us">Contact Us</a>
+    </div>
+    <div class="hamburger-menu" onclick="toggleDashboard()">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+
+    <div id="dashboard" class="dashboard">
+      <div class="dashboard-content">
+        <h2>Hello!</h2>
+        <p>User: {{ first_name }}</p>
+        <form id="logout-form" method="POST" action="/logout">
+          <button type="submit" class="btn">Log out</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="main-content" class="main-content">
+      <h1>SpendSync!</h1>
+      <h6>An Expense Tracker With Visual Analytics</h6>
+      <div class="form-container">
+        <input
+          type="text"
+          id="expense-name"
+          placeholder="Expense name"
+          required
+        />
+        <input
+          type="number"
+          id="expense-amount"
+          placeholder="Amount"
+          required
+        />
+        <select id="expense-category">
+          <option value="" disabled selected>Category</option>
+          <option value="Food">Food</option>
+          <option value="Transport">Transport</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Utilities">Utilities</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Health Care">Health Care</option>
+          <option value="Education">Education</option>
+          <option value="Others">Others</option>
+        </select>
+        <button id="add-expense-btn">Add Expense</button>
+      </div>
+      <center>
+        <div class="btns">
+          <a href="/expenses" class="nav-btn">View Your Expense Lists</a>
+          <a href="/daily_expenses" class="nav-btn">Daily Expenses</a>
+          <a href="/weekly" class="nav-btn">Weekly Expenses</a>
+          <a href="/monthly_expenses" class="nav-btn">Monthly Expenses</a>
+          <a href="/yearly_expenses" class="nav-btn">Yearly Expenses</a>
+        </div>
+      </center>
+    </div>
+
+    <script>
+      function toggleDashboard() {
+        const dashboard = document.getElementById("dashboard");
+        const mainContent = document.getElementById("main-content");
+        dashboard.classList.toggle("active");
+        mainContent.classList.toggle("shrink");
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const expenseNameInput = document.getElementById("expense-name");
+        const expenseAmountInput = document.getElementById("expense-amount");
+        const expenseCategorySelect =
+          document.getElementById("expense-category");
+
+        document
+          .getElementById("add-expense-btn")
+          .addEventListener("click", () => {
+            const name = expenseNameInput.value.trim();
+            const amount = parseFloat(expenseAmountInput.value);
+            const category = expenseCategorySelect.value;
+            const date = new Date().toISOString().split("T")[0]; // ISO Date Format
+
+            if (name && !isNaN(amount) && amount > 0 && category) {
+              const expenseData = {
+                name,
+                amount,
+                category,
+                date,
+              };
+
+              fetch("/add_expense", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(expenseData),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.message) {
+                    alert(data.message);
+                    expenseNameInput.value = "";
+                    expenseAmountInput.value = "";
+                    expenseCategorySelect.value = "";
+                  } else {
+                    alert("Error adding expense");
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error:", error);
+                  alert("An error occurred while adding the expense.");
+                });
+            } else {
+              alert("Please fill in all fields with valid data.");
+            }
+          });
+      });
+    </script>
+  </body>
+</html>

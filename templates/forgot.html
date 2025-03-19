@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forgot Password</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="fixed-header">
+      <div class="site-name">SpendSync</div>
+    </div> 
+    <div class="container">
+      <h1>Forgot Password</h1>
+      <form method="POST" action="/forgot">
+        <label for="email">Email</label><br />
+        <input
+          type="email"
+          name="email"
+          id="email"
+          required
+          placeholder="Enter your email"
+        /><br />
+        <button type="submit" class="button">Send OTP</button>
+      </form>
+      <p class="para">Remembered your password? <a href="/login">Login</a>.</p>
+    </div>
+  </body>
+</html>

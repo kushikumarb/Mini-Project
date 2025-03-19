@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us</title>
+    <style>
+      body {
+        font-family: "Roboto", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #6dd5ed, #2193b0);
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 1.5rem;
+        text-decoration: none;
+        color: #ffffff;
+        background: #003b49;
+        padding: 10px 15px;
+        border-radius: 50%;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .back-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        padding: 20px;
+      }
+
+      .top-member {
+        margin: 30px auto 40px;
+        perspective: 1000px;
+        cursor: pointer;
+        width: 300px;
+        height: 220px;
+        position: relative;
+      }
+
+      .member-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+      }
+
+      .member {
+        perspective: 1000px;
+        cursor: pointer;
+        position: relative;
+        width: 100%;
+        max-width: 300px;
+        height: 220px;
+        transition: transform 0.3s ease;
+      }
+
+      .member:hover {
+        transform: scale(1.05);
+      }
+
+      .member .front,
+      .member .back {
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        background-color: #fff;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        position: absolute;
+        backface-visibility: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.6s ease;
+      }
+
+      .member .front {
+        transform: rotateY(0);
+      }
+
+      .member .back {
+        transform: rotateY(180deg);
+        background: #ffffff;
+        color: #000000;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .member img {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        margin: 20px 0 10px;
+        border: 3px solid #2193b0;
+      }
+
+      .member h3 {
+        font-size: 1.2rem;
+        margin: 5px 0;
+      }
+
+      .member p {
+        font-size: 0.9rem;
+        margin: 5px 0;
+        color: #000000;
+      }
+
+      .member.back p {
+        color: #000000;
+      }
+
+      .member.flipped .front {
+        transform: rotateY(-180deg);
+      }
+
+      .member.flipped .back {
+        transform: rotateY(0);
+      }
+
+      .member:hover .front {
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      @media (max-width: 768px) {
+        .top-member {
+          width: 90%;
+        }
+
+        .member {
+          width: 90%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <a href="/" class="back-button" aria-label="Go Back"> &#8592; </a>
+
+  <body>
+    <div class="container">
+      <div class="member top-member" onclick="flipCard(this)">
+        <div class="front">
+          <img src="/static/Priyanka mam.jpg" alt="Member Photo" />
+          <h3>Prof. Priyanka R N</h3>
+          <p>Project Mentor</p>
+        </div>
+        <div class="back">
+          <img src="/static/Priyanka mam.jpg" alt="Member Photo" />
+          <h3>Prof. Priyanka R N</h3>
+          <p>Project Mentor</p>
+          <p>Email: priyankarn@gmail.com</p>
+          <p>Contact: 0123456789</p>
+        </div>
+      </div>
+
+      <div class="member-grid">
+        <div class="member" onclick="flipCard(this)">
+          <div class="front">
+            <img src="/static/Kushi.jpg" alt="Member Photo" />
+            <h3>Kushikumar B</h3>
+            <p>Developer</p>
+          </div>
+          <div class="back">
+            <img src="/static/Kushi.jpg" alt="Member Photo" />
+            <h3>Kushikumar B</h3>
+            <p>Developer</p>
+            <p>Email: kushikumarbkushikumarb@gmail.com</p>
+            <p>Contact: 1234567890</p>
+          </div>
+        </div>
+        <div class="member" onclick="flipCard(this)">
+          <div class="front">
+            <img src="/static/Honey.jpg" alt="Member Photo" />
+            <h3>Haritejashree N</h3>
+            <p>Developer</p>
+          </div>
+          <div class="back">
+            <img src="/static/Honey.jpg" alt="Member Photo" />
+            <h3>Haritejashree N</h3>
+            <p>Developer</p>
+            <p>Email: haritejashreehoney@gmail.com</p>
+            <p>Contact: 2345678901</p>
+          </div>
+        </div>
+        <div class="member" onclick="flipCard(this)">
+          <div class="front">
+            <img src="/static/Likith.jpg" alt="Member Photo" />
+            <h3>Likhith D P</h3>
+            <p>Developer</p>
+          </div>
+          <div class="back">
+            <img src="/static/Likith.jpg" alt="Member Photo" />
+            <h3>Likhith D P</h3>
+            <p>Developer</p>
+            <p>Email: likhithdp746@gmail.com</p>
+            <p>Contact: 3456789012</p>
+          </div>
+        </div>
+        <div class="member" onclick="flipCard(this)">
+          <div class="front">
+            <img src="/static/Gousiya.jpg" alt="Member Photo" />
+            <h3>Gousiya Asma I</h3>
+            <p>Developer</p>
+          </div>
+          <div class="back">
+            <img src="/static/Gousiya.jpg" alt="Member Photo" />
+            <h3>Gousiya Asma I</h3>
+            <p>Developer</p>
+            <p>Email: shi95492@gmail.com</p>
+            <p>Contact: 4567890123</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function flipCard(card) {
+        card.classList.toggle("flipped");
+      }
+    </script>
+  </body>
+</html>

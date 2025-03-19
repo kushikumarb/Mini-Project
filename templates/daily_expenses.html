@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Expenses</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa;
+      }
+
+      .navigation-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 40px;
+        border: none;
+        background: transparent;
+        color: black;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .navigation-btn:hover {
+        color: #0056b3;
+      }
+
+      .left-arrow {
+        left: 20px;
+      }
+
+      .right-arrow {
+        right: 20px;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 70px;
+        left: 20px;
+        border: none;
+        color: #007bff;
+        font-size: 40px;
+        height: 70px;
+        width: 70px;
+        border-radius: 90px;
+        cursor: pointer;
+      }
+
+      .back-button:hover {
+        color: white;
+        background-color: #007bff;
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 60px;
+        color: #495057;
+        padding-top: 20px;
+      }
+
+      .date-display {
+        text-align: center;
+        font-size: 18px;
+        color: #6c757d;
+        margin-bottom: 20px;
+      }
+
+      .chart-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 40px 0;
+        padding: 20px;
+      }
+
+      .chart-wrapper {
+        max-width: 500px;
+        width: 100%;
+      }
+
+      .no-data {
+        text-align: center;
+        font-size: 18px;
+        color: #6c757d;
+      }
+      .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .fixed-header .site-name {
+        font-weight: bold;
+        font-size: 20px;
+        margin-left: 10px;
+      }
+
+      .fixed-header .contact-us {
+        text-decoration: none;
+        color: white;
+        font-size: 16px;
+        padding: 5px 10px;
+        border: 2px solid white;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        margin-right: 50px;
+      }
+
+      .fixed-header .contact-us:hover {
+        background-color: white;
+        color: #007bff;
+      }
+
+      body {
+        margin-top: 60px;
+      }
+      .date-format-note {
+        text-align: center;
+        font-size: 14px;
+        color: #6c757d;
+        margin-top: -10px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fixed-header">
+      <div class="site-name">SpendSync</div>
+      <a href="/contact-us" class="contact-us">Contact Us</a>
+    </div>
+    <button class="back-button" onclick="goBack()">&#8592;</button>
+
+    <button class="navigation-btn left-arrow" onclick="navigateDay(-1)">
+      &#8592;
+    </button>
+    <button class="navigation-btn right-arrow" onclick="navigateDay(1)">
+      &#8594;
+    </button>
+
+    <h1>Daily Expenses</h1>
+    <p class="date-display" id="current-date"></p>
+    <p class="date-format-note">(Date format: MM/DD/YYYY)</p>
+
+    <div class="chart-container">
+      {% if labels and values %}
+      <div class="chart-wrapper">
+        <canvas id="expenseChart"></canvas>
+      </div>
+      {% else %}
+      <p class="no-data">No expenses recorded for this day.</p>
+      {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      let currentDate = new Date("{{ date | safe }}");
+
+      function goBack() {
+        window.location.href = "/";
+      }
+
+      function navigateDay(offset) {
+        const currentDate = new Date("{{ date }}");
+        currentDate.setDate(currentDate.getDate() + offset);
+        const newDate = currentDate.toISOString().split("T")[0];
+        window.location.href = `/daily_expenses?date=${newDate}`;
+      }
+
+
+      document.getElementById("current-date").innerText = `Date: ${
+        currentDate.getMonth() + 1
+      }/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+
+      {% if labels and values %}
+      const ctx = document.getElementById("expenseChart").getContext("2d");
+      const expenseChart = new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: {{ labels | safe }},
+          datasets: [
+            {
+              data: {{ values | safe }},
+              backgroundColor: [
+                "#FF6384",
+                "#36A2EB",
+                "#FFCE56",
+                "#4CAF50",
+                "#FF9F40",
+                "#FFCD95",
+                "#FF5733",
+                "#8B0000",
+              ],
+              hoverBackgroundColor: [
+                "#FF6384AA",
+                "#36A2EBAA",
+                "#FFCE56AA",
+                "#4CAF50AA",
+                "#FF9F40AA",
+                "#FFCD95AA",
+                "#FF5733AA",
+                "#8B0000AA",
+              ],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                font: {
+                  size: 14,
+                },
+              },
+            },
+          },
+        },
+      });
+      {% endif %}
+    </script>
+  </body>
+</html>
